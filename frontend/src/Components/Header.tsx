@@ -3,8 +3,7 @@ import { LayoutDashboard, SendHorizontal } from "lucide-react";
 import { useLocation } from "react-router";
 
 function Header() {
-  const location = useLocation();
-
+   
   const [active, setActive] = useState("dashboard");
   //   useEffect(()=>{
   //         setActive(location.pathname.split("/")[1])
@@ -72,7 +71,7 @@ function Logo({ key, href, title, icon, className, handleChange }:LogoTypes) {
 }
 
 function NavBar() {
-  const location = useLocation();
+  const location = useLocation()
   const navLink = [
     { name: "Sequences", href: "sequence", icon: <SendHorizontal /> },
     { name: "Outbox", href: "outbox", icon: <LayoutDashboard /> },

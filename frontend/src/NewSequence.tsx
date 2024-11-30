@@ -1,4 +1,5 @@
 import { ChevronDown } from "lucide-react";
+import FlowEditor from "./Components/Flow/FlowEditor";
 
 function NewSequence() {
   return (
@@ -14,6 +15,7 @@ function NewSequence() {
           <ChevronDown className="" />
         </div>
       </div>
+      <FlowEditor />
       
     </main>
   );
