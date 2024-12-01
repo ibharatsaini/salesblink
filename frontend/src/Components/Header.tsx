@@ -3,7 +3,6 @@ import { LayoutDashboard, SendHorizontal } from "lucide-react";
 import { useLocation } from "react-router";
 
 function Header() {
-   
   const [active, setActive] = useState("dashboard");
   //   useEffect(()=>{
   //         setActive(location.pathname.split("/")[1])
@@ -24,14 +23,15 @@ function Header() {
         </div>
         <div className="ml-10 h-full flex flex-row">
           {navItems.map((item, index) => {
-            console.log(item.href, active);
             return (
               <Logo
-                key={item.href}
+                asKey={item.href}
                 href={item.href}
                 title={item.name}
                 icon={item.icon}
-                handleChange={() =>{ setActive(item.href)}}
+                handleChange={() => {
+                  setActive(item.href);
+                }}
                 className={
                   active == item.href ? `bg-slate-100` : `bg-slate-300`
                 }
@@ -47,18 +47,18 @@ function Header() {
 }
 
 interface LogoTypes {
-    key:string,
-    href:string,
-    title:string,
-    icon:ReactNode,
-    className:string,
-    handleChange:()=>void
+  asKey: string;
+  href: string;
+  title: string;
+  icon: ReactNode;
+  className: string;
+  handleChange: () => void;
 }
 
-function Logo({ key, href, title, icon, className, handleChange }:LogoTypes) {
+function Logo({ asKey, href, title, icon, className, handleChange }: LogoTypes) {
   return (
     <a
-      key={key}
+      key={asKey}
       onClick={handleChange}
       href={href}
       className={`w-full h-full flex w-40 bg-slate-100 cursor-pointer p-2 px-4 gap-3 ${className}`}
@@ -71,7 +71,7 @@ function Logo({ key, href, title, icon, className, handleChange }:LogoTypes) {
 }
 
 function NavBar() {
-  const location = useLocation()
+  const location = useLocation();
   const navLink = [
     { name: "Sequences", href: "sequence", icon: <SendHorizontal /> },
     { name: "Outbox", href: "outbox", icon: <LayoutDashboard /> },
@@ -82,6 +82,7 @@ function NavBar() {
       {navLink.map((item) => {
         return (
           <NavLink
+            asKey={item.href}
             href={`${location.pathname}/${item.href}`}
             icon={item.icon}
             title={item.name}
@@ -92,9 +93,20 @@ function NavBar() {
   );
 }
 
-function NavLink({ href, title, icon }:{href:string,title:string,icon:ReactNode}) {
+function NavLink({
+  href,
+  title,
+  icon,
+  asKey,
+}: {
+  href: string;
+  title: string;
+  icon: ReactNode;
+  asKey: string;
+}) {
   return (
     <a
+      key={asKey}
       href={href}
       className="h-full flex items-center justify-start w-36 bg-white cursor-pointer border rounded gap-2 px-4"
     >
