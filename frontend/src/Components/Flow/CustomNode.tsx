@@ -22,10 +22,10 @@ const CustomNode:React.FC<NodeData> = ({data}:any) => {
   if (isAddNode) {
     return (
       <div 
-        className="px-4 py-2 shadow-md rounded-md bg-white border-2 border-gray-300 hover:border-gray-400 cursor-pointer min-w-[180px]"
+        className="px-4 py-2 relative shadow-md rounded-md bg-white border-2 border-gray-300 hover:border-gray-400 cursor-pointer min-w-[180px]"
         onClick={data.onAddNode}
       >
-      <PencilRuler onClick={handleClick} />
+      <PencilRuler className='absolute top-6' onClick={handleClick} />
 
         <Handle type="target" position={Position.Top} className="w-2 h-2" />
         <div className="flex items-center justify-center py-1">

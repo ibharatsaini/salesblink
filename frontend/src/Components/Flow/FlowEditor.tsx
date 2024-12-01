@@ -44,7 +44,7 @@ const FlowEditor= () => {
   const [activeNodeId, setActiveNodeId] = useState<string | null>(null);
   const { screenToFlowPosition } = useReactFlow();
 
-  const { handleSelectNodeType, handleEditProcessNode, handleAddNode, handleLeadsFileSelect } = useFlowNodes(
+  const { handleSelectNodeType, handleEditProcessNode, handleLeadsFileSelect } = useFlowNodes(
     nodes,
     setNodes,
     setEdges,
@@ -95,7 +95,7 @@ const FlowEditor= () => {
       })
     );
   }, [setNodes]);
-  const {editing,handleEdit} = useEditing()
+  const {editing} = useEditing()
 
 
   useEffect(()=>{
@@ -138,7 +138,7 @@ const FlowEditor= () => {
           setIsLeadsModalOpen(false);
           if(!update) setActiveNodeId(null);
         }}
-        onFileSelect={(file:File) => handleLeadsFileSelect(file, activeNodeId)}
+        onFileSelect={(file:File,data:string[]) => handleLeadsFileSelect(file,activeNodeId,data)}
       />
     </div>
   );

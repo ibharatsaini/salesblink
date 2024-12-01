@@ -7,7 +7,7 @@ export const calculateNodePosition = (
   nodes: Node[],
   isAddNode: boolean = false
 ) => {
-  const spacing = isAddNode ? 80 : 160;
+  const spacing = 80
   const nodesBelow = nodes.filter((n) => n.position.y > sourceNode.position.y);
   const maxY =
     nodesBelow.length > 0

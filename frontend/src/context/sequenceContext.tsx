@@ -4,7 +4,7 @@ import { NodeTypes } from "../lib/types";
 interface SequenceContextType {
   steps?: SequenceStep[];
   handleSteps: (newStep: SequenceStep) => void;
-  handleLeads: (newLeads: string) => void;
+  handleLeads: (newLeads: string[]) => void;
   leads?: string[];
 }
 
@@ -39,8 +39,8 @@ export const SequenceProvider = ({ children }: { children: ReactNode }) => {
     });
   }
 
-  function handleLeads(newLeads: string) {
-    setLeads((val: string[]) => [...val, newLeads]);
+  function handleLeads(newLeads: string[]) {
+    setLeads((val: string[]) => [...val, ...newLeads]);
 
   }
   // console.log(steps)

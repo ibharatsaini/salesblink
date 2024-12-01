@@ -19,6 +19,7 @@ export const useFlowNodes = (
   setIsModalOpen: (isOpen: boolean) => void,
   setActiveNodeId: (id: string | null) => void
 ) => {
+  const {handleLeads,steps,handleSteps} = useSequence()
   const handleAddNode = useCallback(
     (nodeId: string) => {
       setActiveNodeId(nodeId);
@@ -28,7 +29,7 @@ export const useFlowNodes = (
   );
 
   const handleLeadsFileSelect = useCallback(
-    (file: File, nodeId: string | null) => {
+    (file: File, nodeId: string | null,data:string[]) => {
       if (!nodeId) return;
 
       const currentNode = nodes.find((n) => n.id === nodeId);
@@ -39,8 +40,8 @@ export const useFlowNodes = (
         id: `leads-file-${Date.now()}`,
         type: "leads",
         position: {
-          x: currentNode.position.x,
-          y: Math.max(...nodes.map((n) => n.position.y)) + 20 * nodes.length,
+          x: Math.max(...nodes.map((n) => n.position.x)) +70 * nodes.length,
+          y: currentNode.position.y,
         },
         data: {
           fileName: file.name,
@@ -60,6 +61,7 @@ export const useFlowNodes = (
         console.log(eds);
         return [...eds, createEdge(newFileNode.id, "start-node")];
       });
+      handleLeads(data)
     },
     [nodes, setNodes, setEdges]
   );
@@ -79,7 +81,6 @@ export const useFlowNodes = (
     },
     [nodes]
   );
-  const { steps, handleSteps } = useSequence();
   const handleSelectNodeType = useCallback(
     (
       type: string,
