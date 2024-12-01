@@ -1,30 +1,29 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import  {
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import {
   ReactFlow,
   Connection,
   useNodesState,
   useEdgesState,
-  Panel,
   addEdge,
-  Node,
   useReactFlow,
   ReactFlowProvider,
   MiniMap,
-} from '@xyflow/react';
+  Background,
+} from "@xyflow/react";
 
 import "@xyflow/react/dist/style.css";
 // import 'reactflow/dist/style.css';
-import LeadsModal from './modals/leadsModal';
-import NodeModal from './NodeModal';
-import { useFlowNodes } from './hooks/useFlowNodes';
-import { createEdgeFromConnection } from './utils/edgeUtils';
-import { createInitialNodes } from './utils/nodeUtils';
-import LeadsNode from './nodes/LeadsNode';
-import ProcessNode from './nodes/ProcessNode';
-import StartNode from './nodes/StartNode';
-import AddNode from './nodes/AddNode';
-import { useEditing } from '../../context/editContext';
-import { NodeDataType, SelectNodeProps } from '../../lib/types';
+import LeadsModal from "./modals/leadsModal";
+import NodeModal from "./NodeModal";
+import { useFlowNodes } from "./hooks/useFlowNodes";
+import { createEdgeFromConnection } from "./utils/edgeUtils";
+import { createInitialNodes } from "./utils/nodeUtils";
+import LeadsNode from "./nodes/LeadsNode";
+import ProcessNode from "./nodes/ProcessNode";
+import StartNode from "./nodes/StartNode";
+import AddNode from "./nodes/AddNode";
+import { useEditing } from "../../context/editContext";
+import { NodeDataType } from "../../lib/types";
 
 const nodeTypes = {
   leads: LeadsNode,
@@ -33,28 +32,29 @@ const nodeTypes = {
   add: AddNode,
 };
 
-const FlowEditor= () => {
-    const reactFlowWrapper = useRef(null);
+const FlowEditor = () => {
+  const reactFlowWrapper = useRef(null);
   const [nodes, setNodes, onNodesChange] = useNodesState(createInitialNodes());
   const [edges, setEdges, onEdgesChange] = useEdgesState([
-    { id: 'e-start-add', source: 'start-node', target: 'add-1' }
+    { id: "e-start-add", source: "start-node", target: "add-1" },
   ]);
   const [isNodeModalOpen, setIsNodeModalOpen] = useState(false);
   const [isLeadsModalOpen, setIsLeadsModalOpen] = useState(false);
   const [activeNodeId, setActiveNodeId] = useState<string | null>(null);
   const { screenToFlowPosition } = useReactFlow();
 
-  const { handleSelectNodeType, handleEditProcessNode, handleLeadsFileSelect } = useFlowNodes(
-    nodes,
-    setNodes,
-    setEdges,
-    activeNodeId,
-    setIsNodeModalOpen,
-    setActiveNodeId
-  );
+  const { handleSelectNodeType, handleEditProcessNode, handleLeadsFileSelect } =
+    useFlowNodes(
+      nodes,
+      setNodes,
+      setEdges,
+      activeNodeId,
+      setIsNodeModalOpen,
+      setActiveNodeId
+    );
 
   const onConnect = useCallback(
-    (params:Connection) => {
+    (params: Connection) => {
       if (!params.source || !params.target) return;
       setEdges((eds) => addEdge(createEdgeFromConnection(params), eds));
     },
@@ -64,7 +64,7 @@ const FlowEditor= () => {
   React.useEffect(() => {
     setNodes((nds) =>
       nds.map((node) => {
-        if (node.type === 'leads') {
+        if (node.type === "leads") {
           return {
             ...node,
             data: {
@@ -76,34 +76,33 @@ const FlowEditor= () => {
             },
           };
         }
-        if (node.type === 'add') {
-          console.log(node.type)
+        if (node.type === "add") {
+          console.log(node.type);
           return {
             ...node,
             data: {
               ...node.data,
               onAddNode: () => {
-                console.log(`clicked`,node.id)
+                console.log(`clicked`, node.id);
                 setActiveNodeId(node.id);
                 setIsNodeModalOpen(true);
               },
             },
           };
         }
-        console.log(node)
+        console.log(node);
         return node;
       })
     );
   }, [setNodes]);
-  const {editing} = useEditing()
+  const { editing } = useEditing();
 
-
-  useEffect(()=>{
-      console.log(`editing`,editing)
-      if(!editing) return
-      setIsNodeModalOpen(true)
-      setActiveNodeId(editing)
-  },[editing])
+  useEffect(() => {
+    console.log(`editing`, editing);
+    if (!editing) return;
+    setIsNodeModalOpen(true);
+    setActiveNodeId(editing);
+  }, [editing]);
 
   return (
     <div className="grow h-[700px]" ref={reactFlowWrapper}>
@@ -122,34 +121,43 @@ const FlowEditor= () => {
           <p className="text-sm text-gray-600 mb-4">Import leads and design your email sequence</p>
         </Panel> */}
         {/* <MiniMap /> */}
+        <Background />
+        <MiniMap />
       </ReactFlow>
       <NodeModal
         isOpen={isNodeModalOpen}
-        onClose={(update?:boolean) => {
+        onClose={(update?: boolean) => {
           setIsNodeModalOpen(false);
-          if(!update) setActiveNodeId(null);
+          if (!update) setActiveNodeId(null);
         }}
-        onSelectNode={(type:string,data:{emailBody?:string,type?:string,time?:number})=>handleSelectNodeType(type,data)}
-        onEdit={(id:string,data:NodeDataType)=>handleEditProcessNode(id,data)}
+        onSelectNode={(
+          type: string,
+          data: { emailBody?: string; type?: string; time?: number }
+        ) => handleSelectNodeType(type, data)}
+        onEdit={(id: string, data: NodeDataType) =>
+          handleEditProcessNode(id, data)
+        }
       />
       <LeadsModal
         isOpen={isLeadsModalOpen}
-        onClose={(update?:boolean) => {
+        onClose={(update?: boolean) => {
           setIsLeadsModalOpen(false);
-          if(!update) setActiveNodeId(null);
+          if (!update) setActiveNodeId(null);
         }}
-        onFileSelect={(file:File,data:string[]) => handleLeadsFileSelect(file,activeNodeId,data)}
+        onFileSelect={(file: File, data: string[]) =>
+          handleLeadsFileSelect(file, activeNodeId, data)
+        }
       />
     </div>
   );
 };
 
 export default () => {
-    return (
-        <ReactFlowProvider>
-            <FlowEditor />
-        </ReactFlowProvider>
-    )
-}
+  return (
+    <ReactFlowProvider>
+      <FlowEditor />
+    </ReactFlowProvider>
+  );
+};
 
 // export default FlowEditor;

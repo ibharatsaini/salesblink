@@ -22,8 +22,8 @@ const ProcessNode: React.FC<ProcessNodeProps> = ({ data }) => {
     <div
       className={`px-4 py-2 relative shadow-md rounded-md bg-white border-2 ${nodeColor} min-w-[180px]`}
     >
-      <PencilRuler className="absolute right-4 mr-1 bg-purple-200 px-px w-4 text-base py-py top-[-12px] text-purple-900 cursor-pointer " onClick={handleClick} />
-      <Trash2 className="absolute right-[-5px] top-[-12px] bg-purple-200 px-px w-4 text-base py-py text-purple-900 cursor-pointer" />
+      <PencilRuler className="absolute right-[-5px] mr-1 bg-purple-200 px-px w-4 text-base py-py top-[-12px] text-purple-900 cursor-pointer " onClick={handleClick} />
+      {/* <Trash2 className="absolute right-[-5px] top-[-12px] bg-purple-200 px-px w-4 text-base py-py text-purple-900 cursor-pointer" /> */}
       <Handle type="target" position={Position.Top} className="w-2 h-2" />
       <div className="flex items-center justify-between">
         <div className="flex-1">

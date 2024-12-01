@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useState } from "react";
 import { LayoutDashboard, SendHorizontal } from "lucide-react";
 import { useLocation } from "react-router";
 
@@ -11,8 +11,8 @@ function Header() {
   //   useLocation
   console.log(active);
   const navItems = [
-    { name: "Dashboard", href: "dashboard", icon: <SendHorizontal /> },
-    { name: "Outreach", href: "outreach", icon: <LayoutDashboard /> },
+    { name: "Dashboard", href: "#", icon: <SendHorizontal /> },
+    { name: "Outreach", href: "outreact", icon: <LayoutDashboard /> },
   ];
 
   return (
@@ -55,12 +55,19 @@ interface LogoTypes {
   handleChange: () => void;
 }
 
-function Logo({ asKey, href, title, icon, className, handleChange }: LogoTypes) {
+function Logo({
+  asKey,
+  href,
+  title,
+  icon,
+  className,
+  handleChange,
+}: LogoTypes) {
   return (
     <a
       key={asKey}
       onClick={handleChange}
-      href={href}
+      // href={href}
       className={`w-full h-full flex w-40 bg-slate-100 cursor-pointer p-2 px-4 gap-3 ${className}`}
     >
       <div className="my-auto">{icon}</div>
@@ -73,9 +80,9 @@ function Logo({ asKey, href, title, icon, className, handleChange }: LogoTypes) 
 function NavBar() {
   const location = useLocation();
   const navLink = [
-    { name: "Sequences", href: "sequence", icon: <SendHorizontal /> },
-    { name: "Outbox", href: "outbox", icon: <LayoutDashboard /> },
-    { name: "List", href: "list", icon: <LayoutDashboard /> },
+    { name: "Sequences", href: "/outreach/sequence", icon: <SendHorizontal /> },
+    { name: "Outbox", href: "#outbox", icon: <LayoutDashboard /> },
+    { name: "List", href: "#list", icon: <LayoutDashboard /> },
   ];
   return (
     <div className="h-[55px] bg-slate-100 mx-10  p-1.5 flex gap-2">
@@ -83,7 +90,7 @@ function NavBar() {
         return (
           <NavLink
             asKey={item.href}
-            href={`${location.pathname}/${item.href}`}
+            href={`${item.href}`}
             icon={item.icon}
             title={item.name}
           />

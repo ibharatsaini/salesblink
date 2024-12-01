@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import  { useRef, useState } from "react";
 import { ChevronDown, Upload } from "lucide-react";
 import Papa from "papaparse";
 

@@ -7,6 +7,7 @@ import { BrowserRouter } from "react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SequenceProvider } from "./context/sequenceContext";
 import EditProvider from "./context/editContext";
+import { Toaster } from "react-hot-toast";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -21,6 +22,8 @@ root.render(
         <EditProvider>
           <BrowserRouter>
             <App />
+
+            <Toaster />
           </BrowserRouter>
         </EditProvider>
       </SequenceProvider>

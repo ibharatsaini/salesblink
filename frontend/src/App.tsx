@@ -15,6 +15,7 @@ function App() {
         <Route path="/outreach" element={<Outreach />} />
         <Route path="/outreach/sequence" element={<NewSequence />} />
       </Routes>
+      
     </div>
   );
 }

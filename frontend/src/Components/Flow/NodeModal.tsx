@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Mail, Clock, ChevronDown, X } from "lucide-react";
-import axiosInstance from "../../lib/configureAxios";
 import {
   ButtonTypeProps,
   NodeDataType,
@@ -339,7 +338,7 @@ const SelectBox = ({
 }: {
   handleChange: (arg0: string) => void;
   selectedOption: string;
-  options: { title: string }[];
+  options: { title: string; _id?: string }[];
   labelText: string;
 }) => {
   const updateSequence = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -365,8 +364,10 @@ const SelectBox = ({
       >
         <option value="">Please choose an option</option>
         {options &&
-          options.map((item: { title: string }) => (
-            <option value={item.title}>{item.title}</option>
+          options.map((item: { title: string; _id?: string }) => (
+            <option value={item._id ? item._id : item.title}>
+              {item.title}
+            </option>
           ))}
       </select>
 

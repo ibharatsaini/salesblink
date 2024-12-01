@@ -3,12 +3,10 @@ import { Node, Edge } from "@xyflow/react";
 import {
   calculateNodePosition,
   createProcessNode,
-  createLeadsNode,
   editProcessNode,
 } from "../utils/nodeUtils";
 import { createEdge } from "../utils/edgeUtils";
 import { useSequence } from "../../../context/sequenceContext";
-import { time } from "console";
 import { NodeDataType } from "../../../lib/types";
 
 export const useFlowNodes = (

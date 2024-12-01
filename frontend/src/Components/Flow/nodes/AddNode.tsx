@@ -1,6 +1,6 @@
 import React from 'react';
 import { Handle, Position } from '@xyflow/react';
-import { PencilRuler, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { AddNodeProps } from '../../../lib/types';
 import { useEditing } from '../../../context/editContext';
 

@@ -12,13 +12,13 @@ interface SequenceContextType {
 //   type:
 // }
 interface SequenceStep {
-  id: string
-  stepNumber: number
+  id: string;
+  stepNumber: number;
   type: NodeTypes;
   emailBody?: string;
   delay?: {
-    type:string,
-    time:number
+    type: string;
+    time: number;
     // days?: number;
     // hours?: number;
     // minutes?: number;
@@ -33,7 +33,7 @@ export const SequenceProvider = ({ children }: { children: ReactNode }) => {
   const [leads, setLeads] = useState<string[]>([]);
 
   function handleSteps(newStep: SequenceStep) {
-    console.log(newStep)
+    console.log(newStep);
     setSteps((values: SequenceStep[]) => {
       return [...values, newStep];
     });
@@ -41,11 +41,12 @@ export const SequenceProvider = ({ children }: { children: ReactNode }) => {
 
   function handleLeads(newLeads: string[]) {
     setLeads((val: string[]) => [...val, ...newLeads]);
-
   }
   // console.log(steps)
   return (
-    <SequenceContext.Provider value={{ handleSteps, handleLeads, steps,leads }}>
+    <SequenceContext.Provider
+      value={{ handleSteps, handleLeads, steps, leads }}
+    >
       {children}
     </SequenceContext.Provider>
   );
