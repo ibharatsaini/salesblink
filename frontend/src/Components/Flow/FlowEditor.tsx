@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import  {
   ReactFlow,
   Connection,
@@ -23,6 +23,8 @@ import LeadsNode from './nodes/LeadsNode';
 import ProcessNode from './nodes/ProcessNode';
 import StartNode from './nodes/StartNode';
 import AddNode from './nodes/AddNode';
+import { useEditing } from '../../context/editContext';
+import { NodeDataType, SelectNodeProps } from '../../lib/types';
 
 const nodeTypes = {
   leads: LeadsNode,
@@ -42,7 +44,7 @@ const FlowEditor= () => {
   const [activeNodeId, setActiveNodeId] = useState<string | null>(null);
   const { screenToFlowPosition } = useReactFlow();
 
-  const { handleSelectNodeType, handleAddNode, handleLeadsFileSelect } = useFlowNodes(
+  const { handleSelectNodeType, handleEditProcessNode, handleAddNode, handleLeadsFileSelect } = useFlowNodes(
     nodes,
     setNodes,
     setEdges,
@@ -75,21 +77,33 @@ const FlowEditor= () => {
           };
         }
         if (node.type === 'add') {
+          console.log(node.type)
           return {
             ...node,
             data: {
               ...node.data,
               onAddNode: () => {
+                console.log(`clicked`,node.id)
                 setActiveNodeId(node.id);
                 setIsNodeModalOpen(true);
               },
             },
           };
         }
+        console.log(node)
         return node;
       })
     );
   }, [setNodes]);
+  const {editing,handleEdit} = useEditing()
+
+
+  useEffect(()=>{
+      console.log(`editing`,editing)
+      if(!editing) return
+      setIsNodeModalOpen(true)
+      setActiveNodeId(editing)
+  },[editing])
 
   return (
     <div className="grow h-[700px]" ref={reactFlowWrapper}>
@@ -98,7 +112,7 @@ const FlowEditor= () => {
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
-        // onConnect={onConnect}
+        onConnect={onConnect}
         nodeTypes={nodeTypes}
         fitView
         className="bg-gray-50"
@@ -111,17 +125,18 @@ const FlowEditor= () => {
       </ReactFlow>
       <NodeModal
         isOpen={isNodeModalOpen}
-        onClose={() => {
+        onClose={(update?:boolean) => {
           setIsNodeModalOpen(false);
-          setActiveNodeId(null);
+          if(!update) setActiveNodeId(null);
         }}
-        onSelectNode={handleSelectNodeType}
+        onSelectNode={(type:string,data:{emailBody?:string,type?:string,time?:number})=>handleSelectNodeType(type,data)}
+        onEdit={(id:string,data:NodeDataType)=>handleEditProcessNode(id,data)}
       />
       <LeadsModal
         isOpen={isLeadsModalOpen}
-        onClose={() => {
+        onClose={(update?:boolean) => {
           setIsLeadsModalOpen(false);
-          setActiveNodeId(null);
+          if(!update) setActiveNodeId(null);
         }}
         onFileSelect={(file:File) => handleLeadsFileSelect(file, activeNodeId)}
       />

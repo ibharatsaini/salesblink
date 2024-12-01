@@ -1,37 +1,75 @@
 import React, { useEffect, useState } from "react";
 import { Mail, Clock, ChevronDown, X } from "lucide-react";
 import axiosInstance from "../../lib/configureAxios";
-import { ButtonTypeProps, NodeModalProps } from "../../lib/types";
+import {
+  ButtonTypeProps,
+  NodeDataType,
+  NodeModalProps,
+  NodeTypes,
+  SelectNodeProps,
+} from "../../lib/types";
+import { getSampleEmails } from "../../lib/dbQueries";
+import { useQuery } from "@tanstack/react-query";
+import { useSequence } from "../../context/sequenceContext";
+// import { useFlowNodes } from "./hooks/useFlowNodes";
+import { useReactFlow } from "@xyflow/react";
+import { useEditing } from "../../context/editContext";
 
-
-
-
-const NodeModal = ({ isOpen, onClose, onSelectNode }:NodeModalProps) => {
+const NodeModal = ({
+  isOpen,
+  onClose,
+  onSelectNode,
+  onEdit,
+}: NodeModalProps) => {
+  const { editing } = useEditing();
+  const { steps } = useSequence();
   const [showComp, setShowComp] = useState("");
-  function handleChange(show:string) {
+  function handleChange(show: string) {
     setShowComp(show);
   }
+  const { getNodes } = useReactFlow();
+  const nodes = getNodes();
+  // console.log(steps,getNodes())
 
-  function handleClose() {
-    setShowComp("");
+  function handleClose(canEdit?: boolean) {
+    !canEdit && setShowComp("");
     onClose();
   }
+  useEffect(() => {
+    if (!editing) return;
+    const node = nodes.find((el) => el.id == editing);
+    setShowComp(node?.data.type as string);
+  }, [editing]);
 
   if (!isOpen) return null;
 
   return showComp ? (
     showComp == "cold-email" ? (
       // <SampleEmailModal onClose={handleClose} />
-      <EditColdEmail onClose={handleClose} />
+      <EditColdEmail
+        onEdit={onEdit}
+        onSelectNode={onSelectNode}
+        onClose={handleClose}
+      />
     ) : (
-      <CounterModal onClose={handleClose} />
+      <EditDelays
+        onEdit={onEdit}
+        onSelectNode={onSelectNode}
+        onClose={handleClose}
+      />
     )
   ) : (
-    <NodeTypes onClose={onClose} handleChange={handleChange} />
+    <NodeTypesModal onClose={onClose} handleChange={handleChange} />
   );
 };
 
-function NodeTypes({ handleChange, onClose }:{handleChange:Function,onClose:()=>void}) {
+function NodeTypesModal({
+  handleChange,
+  onClose,
+}: {
+  handleChange: Function;
+  onClose: () => void;
+}) {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg p-6 w-96 shadow-xl">
@@ -63,12 +101,18 @@ function NodeTypes({ handleChange, onClose }:{handleChange:Function,onClose:()=>
   );
 }
 
-function ButtonType({ handleChange, text, icon, className, subText }:ButtonTypeProps) {
+function ButtonType({
+  handleChange,
+  text,
+  icon,
+  className,
+  subText,
+}: ButtonTypeProps) {
   return (
     <button
       className={`w-full p-4 text-left rounded-lg border-2  transition ${className}`}
       // onClick={() => onSelectNode('cold-email')}
-      onClick={()=>handleChange()}
+      onClick={() => handleChange()}
     >
       <div className="font-semibold flex items-center gap-2">
         {icon}
@@ -78,41 +122,178 @@ function ButtonType({ handleChange, text, icon, className, subText }:ButtonTypeP
     </button>
   );
 }
-const CounterModal = ({ onClose }:{onClose:()=>void}) => {
-  const [count, setCount] = useState(10);
 
-  const decrement = () => setCount((prev) => Math.max(prev - 1, 0));
+const EditDelays = ({
+  onClose,
+  onSelectNode,
+  onEdit,
+}: {
+  onClose: (arg0?: boolean) => void;
+  onSelectNode: (
+    type: NodeTypes,
+    data: { emailBody?: string; type?: string; time?: number }
+  ) => void;
+  onEdit: (id: string, delay: { time: number; type: string }) => void;
+}) => {
+  const [selectedOption, setSelectedOption] = useState<string>("");
+  const [delayTime, setDelayTime] = useState(1);
+  const { editing, handleEdit } = useEditing();
+  //   const { data: lists } = useQuery({
+  //   queryKey: ["sampleEmail"],
+  //   queryFn: () => getSampleEmails(),
+  // });
+  const lists = [{ title: "days" }, { title: "hours" }, { title: "minutes" }];
+  const handleChange = (value: string) => {
+    setSelectedOption(value);
+  };
 
+  const handleDelayChange = (num: number) => {
+    setDelayTime(num);
+  };
+
+  const handleClose = () => {
+    handleEdit(null);
+    onClose();
+  };
+  const { getNodes } = useReactFlow();
+  useEffect(() => {
+    if (!editing) return;
+    const nodes = getNodes();
+    for (let node in nodes) {
+      if (nodes[node].id == editing) {
+        console.log(nodes[node].data);
+        const delayData = nodes[node].data.delay as NodeDataType;
+        setSelectedOption(delayData.type as string);
+        setDelayTime(delayData.time as number);
+        // console.log(editing,`editing`)
+        // console.log()
+        // onEdit(editing,e)
+      }
+      // if(key.id == editing)
+    }
+  }, [editing]);
+  function handleUpdate() {
+    console.log(editing);
+    if (editing) {
+      onEdit(editing as string, { time: delayTime, type: selectedOption });
+      handleEdit(null);
+      onClose(false);
+      return;
+    }
+    onSelectNode("wait", { type: selectedOption, time: delayTime });
+
+    return;
+
+    // handleSteps({ type: "cold-email", emailBody: selectedOption,id:'d',stepNumber:1 });
+    // onEdit(editing,selectedOption)
+    // onClose()
+  }
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="flex flex-col">
-        <h3 className="text-lg mb-4">Counter</h3>
-        <div className="flex items-center space-x-2">
-          <span className="text-xl">{count}</span>
+      <div className="w-[800px] px-10 py-5 h-[calc(100vh-10px)] border rounded-md my-10 gap-4 flex flex-col bg-white">
+        <div className="w-full text-left">
+          <h2 className="text-2xl font-semibold">Edit Delays</h2>
+          <span className="text-base font-normal">
+            Send an Email with delays.
+          </span>
+        </div>
+        <div className="text-left">
+          <div className="">
+            <h3 className="text-lg font-semibold">Edit time</h3>
+            {lists && (
+              <SelectBox
+                selectedOption={selectedOption}
+                handleChange={handleChange}
+                options={lists}
+                labelText="Choose delay"
+              />
+            )}
+            {selectedOption && (
+              <InputBox num={delayTime} handleNum={handleDelayChange} />
+            )}
+          </div>
+        </div>
+        <div className="flex gap-5 mt-auto">
           <button
-            onClick={decrement}
-            className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+            className="mt-4 px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors w-full"
+            onClick={handleClose}
           >
-            Decrement
+            Cancel
+          </button>
+          <button
+            className="mt-4 px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors w-full"
+            onClick={() => handleUpdate()}
+          >
+            Update
           </button>
         </div>
-        <button
-          className="mt-4 px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors w-full"
-          onClick={onClose}
-        >
-          Cancel
-        </button>
       </div>
     </div>
   );
 };
 
-const EditColdEmail = ({ onClose }:{onClose:()=>void}) => {
-  const [emails,setEmails] = useState()
-  useEffect(()=>{
-     const data= axiosInstance(`/api/emails/sample-email`).then(res=>res.data).then(data=>data)
-     console.log(data)
-  },[])
+const EditColdEmail = ({
+  onClose,
+  onSelectNode,
+  onEdit,
+}: {
+  onSelectNode: SelectNodeProps;
+  onClose: (canEdit?: boolean) => void;
+  onEdit: (id: string, data: NodeDataType) => void;
+}) => {
+  // const [emails,setEmails] = useState()
+
+  // useEffect(()=>{
+  //    const data= axiosInstance(`/api/emails/sample-email`).then(res=>res.data).then(data=>data)
+  //    console.log(data)
+  // },[])
+  const { data: lists } = useQuery({
+    queryKey: ["sampleEmail"],
+    queryFn: () => getSampleEmails(),
+  });
+  const [selectedOption, setSelectedOption] = useState("");
+  const { handleEdit, editing } = useEditing();
+  const { getNodes, getNode } = useReactFlow();
+  function handleUpdate() {
+    if (editing) {
+      onEdit(editing as string, { emailBody: selectedOption });
+      handleEdit(null);
+      onClose(false);
+      return;
+    }
+    onSelectNode("cold-email", { emailBody: selectedOption });
+    onClose();
+
+    return;
+
+    // handleSteps({ type: "cold-email", emailBody: selectedOption,id:'d',stepNumber:1 });
+    // onEdit(editing,selectedOption)
+    // onClose()
+  }
+
+  const handleChange = (value: string) => {
+    setSelectedOption(value);
+  };
+
+  const handleClose = () => {
+    handleEdit(null);
+    onClose();
+  };
+
+  useEffect(() => {
+    if (!editing) return;
+    const nodes = getNodes();
+    for (let node in nodes) {
+      if (nodes[node].id == editing) {
+        setSelectedOption(nodes[node].data.emailBody as string);
+        // console.log(editing,`editing`)
+        // console.log()
+        // onEdit(editing,e)
+      }
+      // if(key.id == editing)
+    }
+  }, [editing]);
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="w-[800px] px-10 py-5 h-[calc(100vh-10px)] border rounded-md my-10 gap-4 flex flex-col bg-white">
@@ -123,19 +304,24 @@ const EditColdEmail = ({ onClose }:{onClose:()=>void}) => {
         <div className="text-left">
           <div className="">
             <h3 className="text-lg font-semibold">Edit Template</h3>
-            <SelectBox />
+            <SelectBox
+              selectedOption={selectedOption}
+              handleChange={handleChange}
+              options={lists}
+              labelText="Choose an option"
+            />
           </div>
         </div>
         <div className="flex gap-5 mt-auto">
           <button
             className="mt-4 px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors w-full"
-            onClick={onClose}
+            onClick={handleClose}
           >
             Cancel
           </button>
           <button
             className="mt-4 px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors w-full"
-            onClick={onClose}
+            onClick={() => handleUpdate()}
           >
             Update
           </button>
@@ -145,41 +331,43 @@ const EditColdEmail = ({ onClose }:{onClose:()=>void}) => {
   );
 };
 
-const SelectBox = () => {
-  const [selectedOption, setSelectedOption] = useState("");
-
-  const handleChange = (e:React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedOption(e.target.value);
+const SelectBox = ({
+  options,
+  handleChange,
+  selectedOption,
+  labelText,
+}: {
+  handleChange: (arg0: string) => void;
+  selectedOption: string;
+  options: { title: string }[];
+  labelText: string;
+}) => {
+  const updateSequence = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    handleChange(e.target.value);
   };
 
   const handleClearSelection = () => {
-    setSelectedOption(""); // This will clear the selection
+    handleChange(""); // This will clear the selection
   };
-
   return (
-    <div className="w-full text-left mx-auto mt-10 h-60	relative">
+    <div className="w-full text-left mx-auto mt-10	relative">
       <label
         htmlFor="options"
         className="block text-gray-700 font-semibold mb-2"
       >
-        Choose an option
+        {labelText}
       </label>
       <select
         id="options"
         value={selectedOption}
-        onChange={(e)=>handleChange(e)}
+        onChange={(e) => updateSequence(e)}
         className="block w-full p-3 pr-10 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-800 appearance-none"
       >
-        <option value="" disabled>
-          Select an option...
-        </option>
-        <option value="option1">Option 1</option>
-        <option value="option2">Option 2</option>
-        <option value="option3">Option 3</option>
-        <option value="option4">Option 4</option>
-        {/* <option value="clear" className="text-red-500">
-          <span className="text-xs">Clear Selection (X)</span>
-        </option> */}
+        <option value="">Please choose an option</option>
+        {options &&
+          options.map((item: { title: string }) => (
+            <option value={item.title}>{item.title}</option>
+          ))}
       </select>
 
       {/* Custom Arrow Icon */}
@@ -197,5 +385,31 @@ const SelectBox = () => {
     </div>
   );
 };
+
+function InputBox({
+  num,
+  handleNum,
+}: {
+  num: number;
+  handleNum: (num: number) => void;
+}) {
+  return (
+    <div className="w-full mt-6 text-md">
+      <label htmlFor="delay" className="block text-gray-700 font-semibold">
+        Delay
+      </label>
+      <input
+        className="block mt-2 w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-800 appearance-none"
+        type="number"
+        min={1}
+        max={100}
+        value={num}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+          handleNum(Number(e.target.value))
+        }
+      />
+    </div>
+  );
+}
 
 export default NodeModal;

@@ -1,7 +1,6 @@
 import { Edge, Connection, MarkerType } from '@xyflow/react';
 
 export const createEdge = (source:string, target:string) => {
-  console.log(source,target)
   return {
   id: `e-${source}-${target}`,
   source,
