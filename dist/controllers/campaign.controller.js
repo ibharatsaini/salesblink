@@ -15,7 +15,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.addCampaign = void 0;
 const emailScheduling_1 = __importDefault(require("../lib/emailScheduling"));
 const email_model_1 = __importDefault(require("../models/email.model"));
-const addCampaign = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const express_async_handler_1 = __importDefault(require("express-async-handler"));
+const addCampaign = (0, express_async_handler_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { leads, steps } = req.body;
     const sampleEmail = yield email_model_1.default.find();
     // console.log(leads,steps)
@@ -79,5 +80,5 @@ const addCampaign = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
         res.status(500).json({ error: 'Failed to schedule campaign.' });
         return;
     }
-});
+}));
 exports.addCampaign = addCampaign;
