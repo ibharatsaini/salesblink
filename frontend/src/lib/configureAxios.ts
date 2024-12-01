@@ -1,9 +1,9 @@
 
 import axios from 'axios';
 
-
-const BASE_URL = process.env.ENV == 'production' ?  process.env.BACKEND_URL : 'http://localhost:8080/'
-
+// console.log(process.env)
+const BASE_URL = `https://web-a5hu325dvog2.up-de-fra1-k8s-1.apps.run-on-seenode.com/`
+console.log(BASE_URL)
 const axiosInstance = axios.create({
   baseURL: BASE_URL , 
   withCredentials: true
