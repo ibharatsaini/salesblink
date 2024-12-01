@@ -1,23 +1,18 @@
 import { NextFunction, Request, Response } from "express";
+import sampleModel from "../models/email.model";
+import expressAsyncHandler from "express-async-handler";
 
-const getSampleEmails = async (
+
+const getSampleEmails = expressAsyncHandler(async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  const sampleEmails = [
-    {
-      name: "Sample Email",
-    },
-    {
-      name: "Re: Follow Up",
-    },
-  ];
-
+  const emails = await sampleModel.find()
   res.status(200).json({
-    data: sampleEmails,
+    data: emails,
   });
   return
-};
+});
 
 export { getSampleEmails };
